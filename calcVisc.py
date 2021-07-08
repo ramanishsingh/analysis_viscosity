@@ -22,7 +22,7 @@ from random import randint
 import os
 import shutil
 from fitVisc import fitVisc
-from viscio import LammpsLog
+from viscio import HoomdLog
 import matplotlib
 matplotlib.use('pdf')
 import matplotlib.pyplot as plt
@@ -57,7 +57,7 @@ class calcVisc:
         if dirbase==None:
             dirbase='./'
         filename=dirbase+'1/'+logname
-        Log = LammpsLog.from_file(filename)
+        Log = HoomdLog.from_file(filename)
         (Time,visco)=Log.viscosity(numskip)
         trjlen = len(Time)
         viscosity = np.zeros((numtrj,trjlen))
@@ -69,7 +69,7 @@ class calcVisc:
         
         for i in range(2,numtrj+1):
             filename=dirbase+str(i)+'/'+logname
-            Log = LammpsLog.from_file(filename)
+            Log = HoomdLog.from_file(filename)
             (Time,visco)=Log.viscosity(numskip)
             if len(visco) < trjlen:
                 trjlen = len(visco)

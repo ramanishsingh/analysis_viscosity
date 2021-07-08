@@ -1,2 +1,6 @@
 *.out
-*.pdf
+plots
+__pycache__
+analyze.py
+read_hoomd_log.py
+submit_visc.sh

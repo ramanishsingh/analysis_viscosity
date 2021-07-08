@@ -35,7 +35,7 @@ def autocorrelate (a):
     return d
 
 
-class LammpsLog():
+class HoomdLog():
     """
     Parser for LAMMPS log file (parse function).
     Saves the output properties (log file) in the form of a dictionary (LOG) with the key being
@@ -111,7 +111,7 @@ class LammpsLog():
             llog['temperature']=llog['temperature']/0.0083144626181532
             llog['vol']=llog['lx']**3
            
-            return LammpsLog(llog)
+            return HoomdLog(llog)
 
     def list_properties(self):
         """
@@ -161,10 +161,10 @@ class LammpsLog():
 
     @classmethod
     def from_dict(cls, d):
-        return LammpsLog(d['llog'], d['avgs'])
+        return HoomdLog(d['llog'], d['avgs'])
 
 
 if __name__ == '__main__':
     filename = 'visc.log'
-    log = LammpsLog.from_file(filename)
+    log = HoomdLog.from_file(filename)
     log.viscosity(100001)
