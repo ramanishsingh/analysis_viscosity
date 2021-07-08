@@ -60,8 +60,6 @@ class fitVisc:
         print("\n start is {}th step\n".format(start))
         print("\ncut is {}th step\n".format(cut))
 
-        print(time[start:cut])
-        print(visc[start:cut])
         popt2,pcov2 = optimize.curve_fit(self.doubexp, time[start:cut], visc[start:cut],max_nfev=1000000,p0=popt2, sigma=stddev[start:cut],bounds=(0,[np.inf,1,1e5,1e7]))
         
         fit = []

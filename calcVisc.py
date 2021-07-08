@@ -26,7 +26,7 @@ from viscio import HoomdLog
 import matplotlib
 matplotlib.use('pdf')
 import matplotlib.pyplot as plt
-
+from matplotlib import rcParams
 
 def reject_outliers(data, m=2):
     out=data[abs(data - np.mean(data)) < m * np.std(data)]
@@ -87,7 +87,7 @@ class calcVisc:
         plt.plot(Time/1e6, visc_mean,'k',label="mean of all trajs")
         plt.yticks(np.arange(-1, 1.2, 0.2))
         plt.legend()
-        plt.grid()
+        plt.grid(alpha=0.5)
         plt.ylabel('Viscosity (mPa*s)')
         plt.xlabel('Time (ns)')
         plt.savefig('plots/allinone.pdf')
@@ -96,9 +96,10 @@ class calcVisc:
         Values = []
         fv = fitVisc()
         for i in range(0,numboot):
+            print("Starting bootstrap {}".format(i+1))
             Values.append(self.Bootstrap(numsamples,trjlen,numtrj,viscosity,Time,fv,plot, popt2,i))
             if ver > 1:
-                sys.stdout.write('\rViscosity Bootstrap {} of {} complete'.format(i+1,numboot))
+                sys.stdout.write('\rViscosity Bootstrap {} of {} complete\n'.format(i+1,numboot))
         if ver > 1:
             sys.stdout.write('\n')
         Values=np.asarray(Values)
@@ -149,14 +150,17 @@ class calcVisc:
             average[j] = np.average(Bootlist.transpose()[j])
             stddev[j] = np.std(Bootlist.transpose()[j])
         Value, visc, fit, timep, timepcut = fv.fitvisc(Time,average,stddev,plot,popt2)
+        rcParams.update({'font.size':14})
         plt.figure()
-        plt.plot(Time/1e6, average, label='original average')
-        plt.plot(timep, visc, label='visc')
+        plt.plot(timep, visc, label='Bootstrapped avgd traj visc')
         plt.plot(Time/1e6, stddev,label='stddev')
         plt.axhline(Value, linestyle='--',label='bootstraped average={:.3f}'.format(Value))
         plt.axvline(timepcut,linestyle= '--',label='time cut')
         plt.plot(timep, fit,label='fit')
         plt.legend()
+        plt.grid(alpha=0.5)
+        plt.xlabel('Time (ns)')
+        plt.ylabel('Viscosity (mPa*s)')
         plt.savefig("plots/one_bootstrap_number{}.pdf".format(i+1))
         plt.close()
         return Value
