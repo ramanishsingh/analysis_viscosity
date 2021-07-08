@@ -57,8 +57,8 @@ class fitVisc:
                 cut += 1
         #cut = len(visc)
         #popt2,pcov2 = optimize.curve_fit(self.doubexp, time[start:cut], visc[start:cut],maxfev=1000000,p0=popt2, sigma=stddev[start:cut])
-        print("\n start is {}\n".format(start))
-        print("\ncut is {}\n".format(cut))
+        print("\n start is {}th step\n".format(start))
+        print("\ncut is {}th step\n".format(cut))
 
         print(time[start:cut])
         print(visc[start:cut])
@@ -83,7 +83,7 @@ class fitVisc:
             rcParams.update({'font.size':14})
             print('Viscosity estimate is {}'.format(Value))
             print('A={}, alpha={}, tau1={}, tau2={}'.format(popt2[0],popt2[1],popt2[2],popt2[3]))
-            print('Time cutoff is {}'.format(time[cut]))
+            print('Time cutoff is {} fs = {} ns'.format(time[cut], timep[cut]))
             plt.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
             plt.plot(timep[:len(visc)],visc,label='Viscosity')
             plt.plot(timep[:len(fit)],fit,label='Double Exponential fit')
@@ -93,6 +93,6 @@ class fitVisc:
             plt.ylabel('Viscosity (mPa*s)')
             plt.xlabel('Time (ns)')
             plt.legend()
-            plt.savefig('vfit.pdf')
+            plt.savefig('plots/vfit.pdf')
         
-        return(Value)
+        return Value, visc, fit, timep, timep[cut] 

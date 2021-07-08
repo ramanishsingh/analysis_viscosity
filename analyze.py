@@ -40,13 +40,13 @@ for i in range(1,65):
     plt.figure()
     a['time']=[x*timestep for x in a['timestep']]
     plt.plot(a['time'],a['pressure'])
-    plt.ylim([125,200])
+    #plt.ylim([125,200])
     plt.savefig('pressure.png')
     plt.close()
     plt.figure()
     a['time']=[x*timestep for x in a['timestep']]
     plt.plot(a['time'],a['potential_energy'])
-    plt.ylim([-71000,-68000])
+    #plt.ylim([-71000,-68000])
     plt.savefig('potential.png')
     plt.close()
     os.chdir('..')

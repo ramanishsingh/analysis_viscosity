@@ -19,7 +19,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import numpy as np
 import sys
 from random import randint
-
+import os
+import shutil
 from fitVisc import fitVisc
 from viscio import LammpsLog
 import matplotlib
@@ -47,24 +48,23 @@ class calcVisc:
         pressure tensor autocorrelation function over numtrj lammps trajectories
         
         '''
+        dirpath = os.path.join('plots')
+        if os.path.exists(dirpath) and os.path.isdir(dirpath):
+            shutil.rmtree(dirpath)
+        os.mkdir('plots')
         output['Viscosity']={}
         output['Viscosity']['Units']='cP'
         if dirbase==None:
             dirbase='./'
         filename=dirbase+'1/'+logname
         Log = LammpsLog.from_file(filename)
-        print('comp is reading'+filename)
         (Time,visco)=Log.viscosity(numskip)
-        print("Time after reading log")
-        print(Time)
-        print("visco after reading log")
-        print(visco)
         trjlen = len(Time)
         viscosity = np.zeros((numtrj,trjlen))
         for i in range(0,len(visco)):
             viscosity[0][i] += visco[i]
         if ver>=1:
-            sys.stdout.write('Viscosity Trajectory 1 of {} complete'.format(numtrj))
+            sys.stdout.write('Viscosity Trajectory 1 of {} complete\n'.format(numtrj))
         
         
         for i in range(2,numtrj+1):
@@ -76,31 +76,27 @@ class calcVisc:
             for j in range(0,trjlen):
                 viscosity[i-1][j] += visco[j]
             if ver>=1:
-                sys.stdout.write('\rViscosity Trajectory {} of {} complete'.format(i,numtrj))
+                sys.stdout.write('\rViscosity Trajectory {} of {} complete\n'.format(i,numtrj))
         if ver>=1:
             sys.stdout.write('\n')
         plt.figure()
         for i in range(0,numtrj):
 
-            plt.plot(Time/1e5, viscosity[i][:], alpha=0.25)
+            plt.plot(Time/1e6, viscosity[i][:], alpha=0.3)
         visc_mean=np.mean(viscosity,axis=0)
-        plt.plot(Time/1e5, visc_mean,'k',label="mean of all trajs")
+        plt.plot(Time/1e6, visc_mean,'k',label="mean of all trajs")
         plt.yticks(np.arange(-1, 1.2, 0.2))
         plt.legend()
         plt.grid()
         plt.ylabel('Viscosity (mPa*s)')
         plt.xlabel('Time (ns)')
-        plt.savefig('allinone.pdf')
+        plt.savefig('plots/allinone.pdf')
         plt.close()
         #Begin Bootstrapping for error estimate
         Values = []
         fv = fitVisc()
-        print("viscosity is")
-        print(viscosity)
-        print("Time is")
-        print(Time)
         for i in range(0,numboot):
-            Values.append(self.Bootstrap(numsamples,trjlen,numtrj,viscosity,Time,fv,plot, popt2))
+            Values.append(self.Bootstrap(numsamples,trjlen,numtrj,viscosity,Time,fv,plot, popt2,i))
             if ver > 1:
                 sys.stdout.write('\rViscosity Bootstrap {} of {} complete'.format(i+1,numboot))
         if ver > 1:
@@ -137,7 +133,7 @@ class calcVisc:
         return (ave,stddev,Values)
             
 
-    def Bootstrap(self,numsamples,trjlen,numtrj,viscosity,Time,fv,plot,popt2):
+    def Bootstrap(self,numsamples,trjlen,numtrj,viscosity,Time,fv,plot,popt2,i):
         #Perform calculate the viscosity of one bootstrapping sample
         Bootlist = np.zeros((numsamples,trjlen))
         for j in range(0,numsamples):
@@ -152,10 +148,15 @@ class calcVisc:
         for j in range(0,trjlen):
             average[j] = np.average(Bootlist.transpose()[j])
             stddev[j] = np.std(Bootlist.transpose()[j])
-        Value = fv.fitvisc(Time,average,stddev,plot,popt2)
+        Value, visc, fit, timep, timepcut = fv.fitvisc(Time,average,stddev,plot,popt2)
         plt.figure()
-        plt.plot(Time, average)
-        plt.plot(Time, stddev)
-        plt.savefig("one_bootstrap.pdf")
+        plt.plot(Time/1e6, average, label='original average')
+        plt.plot(timep, visc, label='visc')
+        plt.plot(Time/1e6, stddev,label='stddev')
+        plt.axhline(Value, linestyle='--',label='bootstraped average={:.3f}'.format(Value))
+        plt.axvline(timepcut,linestyle= '--',label='time cut')
+        plt.plot(timep, fit,label='fit')
+        plt.legend()
+        plt.savefig("plots/one_bootstrap_number{}.pdf".format(i+1))
         plt.close()
         return Value

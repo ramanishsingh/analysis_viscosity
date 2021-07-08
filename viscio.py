@@ -74,7 +74,6 @@ class LammpsLog():
         llog['timestep']=1 # fs
 
         with open(filename) as logfile:
-            print(logfile)
             for line in logfile:
                 properties=line.split()
                 break
