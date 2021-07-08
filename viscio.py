@@ -71,7 +71,7 @@ class LammpsLog():
         header = 0
         footer_blank_line = 0
         llog = {}
-        llog['timestep']=0.5 # fs
+        llog['timestep']=1 # fs
 
         with open(filename) as logfile:
             print(logfile)

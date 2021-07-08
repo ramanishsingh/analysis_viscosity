@@ -57,12 +57,12 @@ class fitVisc:
                 cut += 1
         #cut = len(visc)
         #popt2,pcov2 = optimize.curve_fit(self.doubexp, time[start:cut], visc[start:cut],maxfev=1000000,p0=popt2, sigma=stddev[start:cut])
-        print("/n start is {}/n".format(start))
-        print("/ncut is {}/n".format(cut))
+        print("\n start is {}\n".format(start))
+        print("\ncut is {}\n".format(cut))
 
         print(time[start:cut])
         print(visc[start:cut])
-        popt2,pcov2 = optimize.curve_fit(self.doubexp, time[start:cut], visc[start:cut],max_nfev=1000000,p0=popt2, sigma=stddev[start:cut],bounds=(0,[np.inf,np.inf,np.inf,np.inf]))
+        popt2,pcov2 = optimize.curve_fit(self.doubexp, time[start:cut], visc[start:cut],max_nfev=1000000,p0=popt2, sigma=stddev[start:cut],bounds=(0,[np.inf,1,1e5,1e7]))
         
         fit = []
         fit1 = []
@@ -87,8 +87,8 @@ class fitVisc:
             plt.ticklabel_format(axis='x', style='sci', scilimits=(0,0))
             plt.plot(timep[:len(visc)],visc,label='Viscosity')
             plt.plot(timep[:len(fit)],fit,label='Double Exponential fit')
-            plt.plot(timep[:len(fit1)],fit1,label=r'Contribution of $\tau_1$')
-            plt.plot(timep[:len(fit2)],fit2,label=r'Contribution of $\tau_2$')
+           # plt.plot(timep[:len(fit1)],fit1,label=r'Contribution of $\tau_1$')
+           # plt.plot(timep[:len(fit2)],fit2,label=r'Contribution of $\tau_2$')
             plt.axvline(timep[cut])
             plt.ylabel('Viscosity (mPa*s)')
             plt.xlabel('Time (ns)')

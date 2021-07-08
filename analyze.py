@@ -25,7 +25,7 @@ def readlogfile(filename):
     return Log
 
 os.chdir('../simulations')
-timestep=0.0005 # ps
+timestep=0.001 # ps
 for i in range(1,65):
     os.chdir('{}/'.format(i))
     print('current directory is {}'.format(i))

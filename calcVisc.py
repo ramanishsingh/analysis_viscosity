@@ -22,6 +22,10 @@ from random import randint
 
 from fitVisc import fitVisc
 from viscio import LammpsLog
+import matplotlib
+matplotlib.use('pdf')
+import matplotlib.pyplot as plt
+
 
 def reject_outliers(data, m=2):
     out=data[abs(data - np.mean(data)) < m * np.std(data)]
@@ -75,7 +79,19 @@ class calcVisc:
                 sys.stdout.write('\rViscosity Trajectory {} of {} complete'.format(i,numtrj))
         if ver>=1:
             sys.stdout.write('\n')
-        
+        plt.figure()
+        for i in range(0,numtrj):
+
+            plt.plot(Time/1e5, viscosity[i][:], alpha=0.25)
+        visc_mean=np.mean(viscosity,axis=0)
+        plt.plot(Time/1e5, visc_mean,'k',label="mean of all trajs")
+        plt.yticks(np.arange(-1, 1.2, 0.2))
+        plt.legend()
+        plt.grid()
+        plt.ylabel('Viscosity (mPa*s)')
+        plt.xlabel('Time (ns)')
+        plt.savefig('allinone.pdf')
+        plt.close()
         #Begin Bootstrapping for error estimate
         Values = []
         fv = fitVisc()
@@ -129,10 +145,17 @@ class calcVisc:
             print('trajectory {} is chosen'.format(rint))
             for k in range(0,trjlen):
                 Bootlist[j][k] = viscosity[rint][k]
+        
         average = np.zeros(trjlen)
         stddev = np.zeros(trjlen)
+
         for j in range(0,trjlen):
             average[j] = np.average(Bootlist.transpose()[j])
             stddev[j] = np.std(Bootlist.transpose()[j])
         Value = fv.fitvisc(Time,average,stddev,plot,popt2)
+        plt.figure()
+        plt.plot(Time, average)
+        plt.plot(Time, stddev)
+        plt.savefig("one_bootstrap.pdf")
+        plt.close()
         return Value
