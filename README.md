@@ -5,6 +5,11 @@ This package calcuates viscosity from HOOMD log files. The main analysis code is
 Run the parameters_main.py to calculate viscosty for the log files stored in ../simulation/{$i} folder (the relative path can be changed).
 Please check unit conversion in viscio.py (lines 100-115) and timestep (llog['timestep']). Default units are L:nm, E: kJ/mol, and Mass: au.
 
+## Quantities that should be logged
+- Temperature
+- All components of pressure
+- lx, ly, and lz
+- Timestep
 
 ## Relevant papers
 - https://pubs.acs.org/doi/abs/10.1021/acs.jcim.9b00066
